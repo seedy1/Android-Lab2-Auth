@@ -30,7 +30,7 @@ import java.nio.charset.StandardCharsets;
 public class Authentication extends AppCompatActivity {
 
     EditText login, password;
-    String txtLogin, txtPassword;
+    String txtLogin, txtPass;
     TextView result;
     JSONObject jsonObject;
 
@@ -38,32 +38,23 @@ public class Authentication extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authentication);
-
-
     }
 
-
-    /*
-     *
-     new Thread() {
-        public void run() {
-          new URL("http://www.stackoverflow.com").getContent();
-        }
-      }.start();
-     */
-
+    // onclick method handler for the authenticate button
     public void auth(View view) {
 
+        // get UI inputs
         login = (EditText) findViewById(R.id.login);
         password = (EditText) findViewById(R.id.password);
         result = (TextView)findViewById(R.id.result);
 
-        String txtLogin = login.getText().toString();
-//        Byte txtLogin = login.;
-        String txtPass = password.getText().toString();
+        // change inputs to strings
+        txtLogin = login.getText().toString();
+        txtPass = password.getText().toString();
+
         new Thread(){
             @Override
-            public void run() {
+            public void run() { // thread to not disturb the UI thread
 
                 URL url = null;
                 try {
@@ -71,29 +62,28 @@ public class Authentication extends AppCompatActivity {
                     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                     // adding auth headers
                     String userAndPassword = txtLogin+":"+txtPass; // text values from text fields
-                    Log.i("USR", txtLogin);
-                    Log.i("PWD", txtPass);
+//                    Log.i("USR", txtLogin);
+//                    Log.i("PWD", txtPass);
                     String basicAuth = "Basic "+ Base64.encodeToString(userAndPassword.getBytes(), Base64.NO_WRAP);
-//                    String basicAuth = "Basic "+ Base64.encodeToString("bob:sympa".getBytes(), Base64.NO_WRAP);
                     urlConnection.setRequestProperty("Authorization", basicAuth);
 
-
                     try {
+                        // read the returned HTML
                         InputStream in = new BufferedInputStream(urlConnection.getInputStream());
                         String s = readStream(in);
                         Log.i("JFL", s);
 
-                        jsonObject = new JSONObject(s);
+                        jsonObject = new JSONObject(s); // storing the returned html in JSON form for easy access
+
                         boolean res = jsonObject.getBoolean("authenticated");
 //                        String usr = jsonObject.getString("user");
-                        runOnUiThread(new Runnable() {
+                        runOnUiThread(new Runnable() { // safe way to access the UI thread
                             @Override
                             public void run() {
                                 result.setText(""+res);
                             }
                         });
 
-//                        result.setText("My result here");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     } finally {
@@ -104,14 +94,13 @@ public class Authentication extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-//                catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+
             }
         }.start();
 
     }
 
+    // method to get url info in String format
     private String readStream(InputStream in) {
         try {
             ByteArrayOutputStream bo = new ByteArrayOutputStream();
@@ -126,14 +115,4 @@ public class Authentication extends AppCompatActivity {
         }
     }
 
-// method to get url info in String format
-        private String readStream1(InputStream in) throws IOException {
-                StringBuilder sb = new StringBuilder();
-                BufferedReader r = new BufferedReader(new InputStreamReader(in),1000);
-                for (String line = r.readLine(); line != null; line =r.readLine()){
-                    sb.append(line);
-                }
-                in.close();
-                return sb.toString();
-        }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+<!--    to permit traffic from external url-->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">api.example.com(to be adjusted)</domain>
     </domain-config>
